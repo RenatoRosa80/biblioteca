@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Livros Disponíveis</h2>
+<div class="row">
+    {% for livro in livros %}
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ livro.titulo }}</h5>
+                <p class="card-text"><strong>Autor:</strong> {{ livro.autor }}</p>
+                <p class="card-text"><strong>Gênero:</strong> {{ livro.genero }}</p>
+                <p class="card-text"><strong>Preço:</strong> R$ {{ livro.preco }}</p>
+                <p class="card-text">
+                    <strong>Status:</strong>
+                    {% if livro.disponivel %}
+                        <span class="text-success">Disponível</span>
+                    {% else %}
+                        <span class="text-danger">Indisponível</span>
+                    {% endif %}
+                </p>
+                {% if current_user.is_admin %}
+                <a href="{{ url_for('editar_livro', livro_id=livro.id) }}" class="btn btn-warning btn-sm">Editar</a>
+                <a href="{{ url_for('deletar_livro', livro_id=livro.id) }}" class="btn btn-danger btn-sm">Deletar</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if current_user.is_admin %}
+<hr>
+<h2 class="mb-4">Usuários</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Admin</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for usuario in usuarios %}
+        <tr>
+            <td>{{ usuario.nome }}</td>
+            <td>{{ usuario.email }}</td>
+            <td>{{ 'Sim' if usuario.is_admin else 'Não' }}</td>
+            <td>
+                <a href="{{ url_for('editar_usuario', usuario_id=usuario.id) }}" class="btn btn-warning btn-sm">Editar</a>
+                <a href="{{ url_for('deletar_usuario', usuario_id=usuario.id) }}" class="btn btn-danger btn-sm">Deletar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}
