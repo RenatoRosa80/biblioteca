@@ -1,0 +1,135 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard - Biblioteca{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h3>Quantidade de Livros</h3>
+  </div>
+  <div class="card-body">
+    <div class="row mb-4">
+      <div class="col-md-2">
+        <div class="card text-white bg-primary mb-2">
+          <div class="card-body text-center">
+            <h6>Total</h6>
+            <h3>{{ total }}</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="card text-white bg-warning mb-2">
+          <div class="card-body text-center">
+            <h6>Emprestados</h6>
+            <h3>{{ emprestados }}</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="card text-white bg-success mb-2">
+          <div class="card-body text-center">
+            <h6>Devolvidos</h6>
+            <h3>{{ devolvidos }}</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="card text-white bg-info mb-2">
+          <div class="card-body text-center">
+            <h6>Vendidos</h6>
+            <h3>{{ vendidos }}</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="card text-white bg-secondary mb-2">
+          <div class="card-body text-center">
+            <h6>Disponíveis</h6>
+            <h3>{{ disponiveis }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empréstimos Ativos -->
+    <div class="card mb-4">
+      <div class="card-header bg-warning text-white"><strong>Empréstimos Ativos</strong></div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr><th>Livro</th><th>Usuário</th><th>Data Empréstimo</th><th>Ações</th></tr>
+            </thead>
+            <tbody>
+              {% for emprestimo in emprestimos_ativos %}
+              <tr>
+                <td>{{ emprestimo.livro.titulo }}</td>
+                <td>{{ emprestimo.usuario.nome }}</td>
+                <td>{{ emprestimo.data_emprestimo.strftime('%d/%m/%Y') }}</td>
+                <td>
+                  <a href="{{ url_for('devolver_livro', emprestimo_id=emprestimo.id) }}" class="btn btn-success btn-sm">Devolver</a>
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="4" class="text-center">Nenhum empréstimo ativo</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Devolvidos -->
+    <div class="card mb-4">
+      <div class="card-header bg-success text-white"><strong>Histórico de Devoluções</strong></div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr><th>Livro</th><th>Usuário</th><th>Data Empréstimo</th><th>Data Devolução</th></tr>
+            </thead>
+            <tbody>
+              {% for e in emprestimos_devolvidos %}
+              <tr>
+                <td>{{ e.livro.titulo }}</td>
+                <td>{{ e.usuario.nome }}</td>
+                <td>{{ e.data_emprestimo.strftime('%d/%m/%Y') }}</td>
+                <td>{{ e.data_devolucao.strftime('%d/%m/%Y') }}</td>
+              </tr>
+              {% else %}
+              <tr><td colspan="4" class="text-center">Nenhuma devolução registrada</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vendas Recentes -->
+    <div class="card mb-4">
+      <div class="card-header bg-info text-white"><strong>Vendas Recentes</strong></div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead><tr><th>Livro</th><th>Comprador</th><th>Data</th><th>Valor</th></tr></thead>
+            <tbody>
+              {% for venda in vendas_recentes %}
+              <tr>
+                <td>{{ venda.livro.titulo }}</td>
+                <td>{{ venda.usuario.nome }}</td>
+                <td>{{ venda.data_venda.strftime('%d/%m/%Y') }}</td>
+                <td>R$ {{ "%.2f"|format(venda.preco) }}</td>
+              </tr>
+              {% else %}
+              <tr><td colspan="4" class="text-center">Nenhuma venda registrada</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Voltar</a>
+  </div>
+</div>
+{% endblock %}

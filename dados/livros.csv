@@ -1,0 +1,41 @@
+titulo,autor,genero,preco,disponivel
+O Senhor dos Anéis,J.R.R. Tolkien,Fantasia,89.90,true
+1984,George Orwell,Ficção Científica,45.90,true
+Dom Casmurro,Machado de Assis,Literatura Brasileira,29.90,true
+Harry Potter e a Pedra Filosofal,J.K. Rowling,Fantasia,55.90,true
+Cem Anos de Solidão,Gabriel García Márquez,Literatura Estrangeira,49.90,true
+O Pequeno Príncipe,Antoine de Saint-Exupéry,Literatura Infantil,25.90,true
+A Metamorfose,Franz Kafka,Literatura Estrangeira,32.90,true
+O Alquimista,Paulo Coelho,Literatura Brasileira,39.90,true
+Crime e Castigo,Fiódor Dostoiévski,Literatura Estrangeira,59.90,true
+Memórias Póstumas de Brás Cubas,Machado de Assis,Literatura Brasileira,34.90,true
+A Revolução dos Bichos,George Orwell,Ficção,42.90,true
+O Hobbit,J.R.R. Tolkien,Fantasia,49.90,true
+Grande Sertão: Veredas,João Guimarães Rosa,Literatura Brasileira,64.90,true
+O Nome do Vento,Patrick Rothfuss,Fantasia,79.90,true
+A Menina que Roubava Livros,Markus Zusak,Literatura Estrangeira,44.90,true
+Capitães da Areia,Jorge Amado,Literatura Brasileira,38.90,true
+Duna,Frank Herbert,Ficção Científica,69.90,true
+O Código Da Vinci,Dan Brown,Suspense,47.90,true
+A Arte da Guerra,Sun Tzu,Não Ficção,29.90,true
+Orgulho e Preconceito,Jane Austen,Romance,39.90,true
+Iracema,José de Alencar,Literatura Brasileira,32.90,true
+Senhora,José de Alencar,Literatura Brasileira,35.90,true
+O Guarani,José de Alencar,Literatura Brasileira,34.90,true
+Romanceiro da Inconfidência,Cecília Meireles,Poesia Brasileira,45.90,true
+Ou Isto ou Aquilo,Cecília Meireles,Poesia Brasileira,29.90,true
+A Rosa do Povo,Carlos Drummond de Andrade,Poesia Brasileira,39.90,true
+Claro Enigma,Carlos Drummond de Andrade,Poesia Brasileira,37.90,true
+Quincas Borba,Machado de Assis,Literatura Brasileira,38.90,true
+Helena,Machado de Assis,Literatura Brasileira,33.90,true
+A Hora da Estrela,Clarice Lispector,Literatura Brasileira,35.90,true
+Perto do Coração Selvagem,Clarice Lispector,Literatura Brasileira,42.90,true
+Vidas Secas,Graciliano Ramos,Literatura Brasileira,39.90,true
+São Bernardo,Graciliano Ramos,Literatura Brasileira,37.90,true
+Apontamentos de História Sobrenatural,Mario Quintana,Poesia Brasileira,34.90,true
+A Rua dos Cataventos,Mario Quintana,Poesia Brasileira,32.90,true
+Sagarana,João Guimarães Rosa,Literatura Brasileira,45.90,true
+Primeiras Estórias,João Guimarães Rosa,Literatura Brasileira,43.90,true
+
+
+<!...python .\scripts\import_books.py .\dados\livros.csv--->
