@@ -39,6 +39,8 @@ class Livro(db.Model):
     disponivel = db.Column(db.Boolean, default=True)
 
 class Emprestimo(db.Model):
+    __tablename__ = 'empresimo'  # 🔥 CORREÇÃO: usar o nome correto da tabela
+    
     id = db.Column(db.Integer, primary_key=True)
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'))
     livro_id = db.Column(db.Integer, db.ForeignKey('livro.id'))
@@ -87,12 +89,12 @@ def fix_database():
         conn = sqlite3.connect('biblioteca.db')
         cursor = conn.cursor()
         
-        # Verifica e adiciona coluna data_devolucao se não existir
-        cursor.execute("PRAGMA table_info(emprestimo)")
+        # 🔥 CORREÇÃO: usar o nome correto da tabela
+        cursor.execute("PRAGMA table_info(empresimo)")
         columns = [row[1] for row in cursor.fetchall()]
         
         if 'data_devolucao' not in columns:
-            cursor.execute("ALTER TABLE emprestimo ADD COLUMN data_devolucao DATETIME")
+            cursor.execute("ALTER TABLE empresimo ADD COLUMN data_devolucao DATETIME")
             print("✅ Coluna data_devolucao adicionada!")
         
         # Verifica e adiciona coluna cancelada se não existir
@@ -102,6 +104,32 @@ def fix_database():
         if 'cancelada' not in columns:
             cursor.execute("ALTER TABLE venda ADD COLUMN cancelada BOOLEAN DEFAULT FALSE")
             print("✅ Coluna cancelada adicionada!")
+        
+        # 🔥 CORREÇÃO: renomear coluna data_empresimo para data_emprestimo se existir
+        cursor.execute("PRAGMA table_info(empresimo)")
+        columns = [row[1] for row in cursor.fetchall()]
+        
+        if 'data_empresimo' in columns and 'data_emprestimo' not in columns:
+            print("🔄 Renomeando coluna data_empresimo para data_emprestimo...")
+            # SQLite não suporta RENAME COLUMN, então criamos uma nova tabela
+            cursor.execute('''
+                CREATE TABLE temp_empresimo (
+                    id INTEGER PRIMARY KEY,
+                    usuario_id INTEGER,
+                    livro_id INTEGER,
+                    data_emprestimo DATETIME,
+                    data_devolucao DATETIME,
+                    FOREIGN KEY (usuario_id) REFERENCES usuario (id),
+                    FOREIGN KEY (livro_id) REFERENCES livro (id)
+                )
+            ''')
+            cursor.execute('''
+                INSERT INTO temp_empresimo (id, usuario_id, livro_id, data_emprestimo, data_devolucao)
+                SELECT id, usuario_id, livro_id, data_empresimo, data_devolucao FROM empresimo
+            ''')
+            cursor.execute("DROP TABLE empresimo")
+            cursor.execute("ALTER TABLE temp_empresimo RENAME TO empresimo")
+            print("✅ Coluna renomeada com sucesso!")
         
         conn.commit()
         conn.close()
@@ -309,12 +337,14 @@ def index():
     # Estatísticas
     total_livros = Livro.query.count()
     livros_disponiveis = Livro.query.filter_by(disponivel=True).count()
+    # 🔥 CORREÇÃO: usar o nome correto da tabela
     emprestimos_ativos = Emprestimo.query.filter_by(data_devolucao=None).count()
     total_vendas = Venda.query.filter_by(cancelada=False).count()
     
     # Dados para as tabelas
     livros = Livro.query.all()
     usuarios = Usuario.query.all() if current_user.is_admin else []
+    # 🔥 CORREÇÃO: usar o nome correto da tabela
     emprestimos = Emprestimo.query.filter_by(data_devolucao=None).all()
     vendas = Venda.query.filter_by(cancelada=False).order_by(Venda.data_venda.desc()).limit(10).all()
     
