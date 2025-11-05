@@ -1,60 +1,266 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<h2 class="mb-4">Livros Disponíveis</h2>
 <div class="row">
-    {% for livro in livros %}
-    <div class="col-md-4 mb-3">
-        <div class="card h-100">
+    <div class="col-12">
+        <h2>Dashboard da Biblioteca</h2>
+        <p class="lead">Bem-vindo, {{ current_user.nome }}!</p>
+    </div>
+</div>
+
+<!-- Estatísticas -->
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
             <div class="card-body">
-                <h5 class="card-title">{{ livro.titulo }}</h5>
-                <p class="card-text"><strong>Autor:</strong> {{ livro.autor }}</p>
-                <p class="card-text"><strong>Gênero:</strong> {{ livro.genero }}</p>
-                <p class="card-text"><strong>Preço:</strong> R$ {{ livro.preco }}</p>
-                <p class="card-text">
-                    <strong>Status:</strong>
-                    {% if livro.disponivel %}
-                        <span class="text-success">Disponível</span>
-                    {% else %}
-                        <span class="text-danger">Indisponível</span>
-                    {% endif %}
-                </p>
-                {% if current_user.is_admin %}
-                <a href="{{ url_for('editar_livro', livro_id=livro.id) }}" class="btn btn-warning btn-sm">Editar</a>
-                <a href="{{ url_for('deletar_livro', livro_id=livro.id) }}" class="btn btn-danger btn-sm">Deletar</a>
-                {% endif %}
+                <h5 class="card-title">Total de Livros</h5>
+                <p class="card-text display-6">{{ total_livros }}</p>
             </div>
         </div>
     </div>
-    {% endfor %}
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Disponíveis</h5>
+                <p class="card-text display-6">{{ livros_disponiveis }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Empréstimos</h5>
+                <p class="card-text display-6">{{ emprestimos_ativos }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Vendas</h5>
+                <p class="card-text display-6">{{ total_vendas }}</p>
+            </div>
+        </div>
+    </div>
 </div>
 
+<!-- Botões de Ação -->
 {% if current_user.is_admin %}
-<hr>
-<h2 class="mb-4">Usuários</h2>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Nome</th>
-            <th>Email</th>
-            <th>Admin</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for usuario in usuarios %}
-        <tr>
-            <td>{{ usuario.nome }}</td>
-            <td>{{ usuario.email }}</td>
-            <td>{{ 'Sim' if usuario.is_admin else 'Não' }}</td>
-            <td>
-                <a href="{{ url_for('editar_usuario', usuario_id=usuario.id) }}" class="btn btn-warning btn-sm">Editar</a>
-                <a href="{{ url_for('deletar_usuario', usuario_id=usuario.id) }}" class="btn btn-danger btn-sm">Deletar</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Gestão do Sistema</h4>
+            <div>
+                <a href="{{ url_for('novo_livro') }}" class="btn btn-primary me-2">📚 Novo Livro</a>
+                <a href="{{ url_for('cadastrar_usuario') }}" class="btn btn-success me-2">👥 Novo Usuário</a>
+                <a href="{{ url_for('novo_emprestimo') }}" class="btn btn-warning me-2">📖 Novo Empréstimo</a>
+                <a href="{{ url_for('nova_venda') }}" class="btn btn-info me-2">💰 Nova Venda</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Seção de Empréstimos Ativos -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>📖 Empréstimos Ativos</h4>
+            <span class="badge bg-warning">{{ emprestimos|length }} ativos</span>
+        </div>
+
+        {% if emprestimos %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="table-warning">
+                    <tr>
+                        <th>Livro</th>
+                        <th>Usuário</th>
+                        <th>Data Empréstimo</th>
+                        <th>Dias</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for emprestimo in emprestimos %}
+                    <tr>
+                        <td><strong>{{ emprestimo.livro.titulo }}</strong></td>
+                        <td>{{ emprestimo.usuario.nome }}</td>
+                        <td>{{ emprestimo.data_emprestimo.strftime('%d/%m/%Y') }}</td>
+                        <td>
+                            <span
+                                class="badge {% if emprestimo.dias_decorridos > 14 %}bg-danger{% else %}bg-success{% endif %}">
+                                {{ emprestimo.dias_decorridos }} dias
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('devolver_emprestimo', emprestimo_id=emprestimo.id) }}"
+                                class="btn btn-sm btn-success" onclick="return confirm('Marcar \" {{
+                                emprestimo.livro.titulo }}\" como devolvido?')">
+                                ✅ Devolver
+                            </a>
+                            {% if current_user.is_admin %}
+                            <a href="{{ url_for('cancelar_emprestimo', emprestimo_id=emprestimo.id) }}"
+                                class="btn btn-sm btn-danger" onclick="return confirm('Cancelar empréstimo de \" {{
+                                emprestimo.livro.titulo }}\"?')">
+                                ❌ Cancelar
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">📚 Nenhum empréstimo ativo no momento.</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Seção de Vendas Recentes -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>💰 Vendas Recentes</h4>
+            <span class="badge bg-info">{{ vendas|length }} vendas</span>
+        </div>
+
+        {% if vendas %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="table-info">
+                    <tr>
+                        <th>Livro</th>
+                        <th>Usuário</th>
+                        <th>Preço</th>
+                        <th>Data Venda</th>
+                        {% if current_user.is_admin %}
+                        <th>Ações</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for venda in vendas %}
+                    <tr>
+                        <td><strong>{{ venda.livro.titulo }}</strong></td>
+                        <td>{{ venda.usuario.nome }}</td>
+                        <td>R$ {{ "%.2f"|format(venda.preco) }}</td>
+                        <td>{{ venda.data_venda.strftime('%d/%m/%Y') }}</td>
+                        {% if current_user.is_admin %}
+                        <td>
+                            <a href="{{ url_for('cancelar_venda', venda_id=venda.id) }}" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Cancelar venda de \" {{ venda.livro.titulo }}\"?')">
+                                ❌ Cancelar
+                            </a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">💰 Nenhuma venda registrada.</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Acervo de Livros -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>📚 Acervo de Livros</h4>
+            <span class="badge bg-primary">{{ livros|length }} livros</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>Gênero</th>
+                        <th>Preço</th>
+                        <th>Disponível</th>
+                        {% if current_user.is_admin %}
+                        <th>Ações</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for livro in livros %}
+                    <tr>
+                        <td><strong>{{ livro.titulo }}</strong></td>
+                        <td>{{ livro.autor }}</td>
+                        <td><span class="badge bg-secondary">{{ livro.genero }}</span></td>
+                        <td>R$ {{ "%.2f"|format(livro.preco) }}</td>
+                        <td>
+                            {% if livro.disponivel %}
+                            <span class="badge bg-success">✅ Disponível</span>
+                            {% else %}
+                            <span class="badge bg-danger">❌ Indisponível</span>
+                            {% endif %}
+                        </td>
+                        {% if current_user.is_admin %}
+                        <td>
+                            <a href="{{ url_for('editar_livro', livro_id=livro.id) }}" class="btn btn-sm btn-warning">✏️
+                                Editar</a>
+                            <a href="{{ url_for('deletar_livro', livro_id=livro.id) }}" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Deletar \" {{ livro.titulo }}\"?')">🗑️ Deletar</a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de Usuários (apenas para admin) -->
+{% if current_user.is_admin and usuarios %}
+<div class="row mt-4">
+    <div class="col-12">
+        <h4>👥 Usuários do Sistema</h4>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Tipo</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td>{{ usuario.nome }}</td>
+                        <td>{{ usuario.email }}</td>
+                        <td>
+                            {% if usuario.is_admin %}
+                            <span class="badge bg-danger">Administrador</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Usuário</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('editar_usuario', usuario_id=usuario.id) }}"
+                                class="btn btn-sm btn-warning">✏️ Editar</a>
+                            {% if usuario.id != current_user.id %}
+                            <a href="{{ url_for('deletar_usuario', usuario_id=usuario.id) }}"
+                                class="btn btn-sm btn-danger" onclick="return confirm('Deletar usuário \" {{
+                                usuario.nome }}\"?')">🗑️ Deletar</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endif %}
 {% endblock %}

@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Novo Empréstimo{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-warning text-white">
+                <h4 class="mb-0">📖 Novo Empréstimo</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="usuario_id" class="form-label">👤 Selecione o Usuário:</label>
+                                <select class="form-select" id="usuario_id" name="usuario_id" required>
+                                    <option value="">Selecione um usuário...</option>
+                                    {% for usuario in usuarios %}
+                                    <option value="{{ usuario.id }}">{{ usuario.nome }} ({{ usuario.email }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="livro_id" class="form-label">📚 Selecione o Livro:</label>
+                                <select class="form-select" id="livro_id" name="livro_id" required>
+                                    <option value="">Selecione um livro disponível...</option>
+                                    {% for livro in livros %}
+                                    <option value="{{ livro.id }}">{{ livro.titulo }} - {{ livro.autor }} (R$ {{
+                                        "%.2f"|format(livro.preco) }})</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">
+                                    <strong>Livros disponíveis:</strong> {{ livros|length }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informações do Livro Selecionado -->
+                    <div id="livro-info" class="alert alert-info d-none">
+                        <h6>Informações do Livro:</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Título:</strong> <span id="info-titulo"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Autor:</strong> <span id="info-autor"></span>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <strong>Gênero:</strong> <span id="info-genero"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Preço:</strong> R$ <span id="info-preco"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('index') }}" class="btn btn-secondary me-md-2">
+                            ↩️ Voltar
+                        </a>
+                        <button type="submit" class="btn btn-warning">
+                            ✅ Realizar Empréstimo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Lista de Livros Disponíveis -->
+        <div class="card mt-4 shadow">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">📚 Livros Disponíveis para Empréstimo</h5>
+            </div>
+            <div class="card-body">
+                {% if livros %}
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Título</th>
+                                <th>Autor</th>
+                                <th>Gênero</th>
+                                <th>Preço</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for livro in livros %}
+                            <tr>
+                                <td><strong>{{ livro.titulo }}</strong></td>
+                                <td>{{ livro.autor }}</td>
+                                <td><span class="badge bg-secondary">{{ livro.genero }}</span></td>
+                                <td>R$ {{ "%.2f"|format(livro.preco) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-warning text-center">
+                    📭 Nenhum livro disponível para empréstimo no momento.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const livroSelect = document.getElementById('livro_id');
+        const livroInfo = document.getElementById('livro-info');
+
+        // Dados dos livros para o JavaScript
+        const livrosData = {
+        {% for livro in livros %}
+        { { livro.id } }: {
+            titulo: "{{ livro.titulo }}",
+                autor: "{{ livro.autor }}",
+                    genero: "{{ livro.genero }}",
+                        preco: "{{ " % .2f"|format(livro.preco) }}"
+        },
+        {% endfor %}
+    };
+
+    livroSelect.addEventListener('change', function () {
+        const livroId = this.value;
+
+        if (livroId && livrosData[livroId]) {
+            const livro = livrosData[livroId];
+            document.getElementById('info-titulo').textContent = livro.titulo;
+            document.getElementById('info-autor').textContent = livro.autor;
+            document.getElementById('info-genero').textContent = livro.genero;
+            document.getElementById('info-preco').textContent = livro.preco;
+            livroInfo.classList.remove('d-none');
+        } else {
+            livroInfo.classList.add('d-none');
+        }
+    });
+});
+</script>
+{% endblock %}
