@@ -39,7 +39,7 @@ class Livro(db.Model):
     disponivel = db.Column(db.Boolean, default=True)
 
 class Emprestimo(db.Model):
-    __tablename__ = 'empresimo'  # 🔥 CORREÇÃO: usar o nome correto da tabela
+    __tablename__ = 'emprestimo' 
     
     id = db.Column(db.Integer, primary_key=True)
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'))
