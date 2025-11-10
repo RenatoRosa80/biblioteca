@@ -1,1 +1,0 @@
-# Todas as classes estão em app.py para simplificação
